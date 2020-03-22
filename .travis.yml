@@ -29,7 +29,7 @@ addons:
 
 install:
   - nvm install
-  - npm install
+  - npm ci
 
 before_script:
   - 'if [ ${TRAVIS_OS_NAME} = "linux" ]; then

@@ -10,10 +10,9 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
-    "uhk-common": "1.0.0"
+    "uhk-common": "file:../uhk-common"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "scripts": {
     "test": "jasmine-ts --config=jasmine.json",
     "lint": "tslint --project tsconfig.json"

@@ -26,7 +26,7 @@ For everyone else, use the appropriate package manager for your OS.
 ```
 git clone git@github.com:UltimateHackingKeyboard/agent.git
 cd agent
-npm install
+npm ci
 npm run build
 npm run electron
 ```
