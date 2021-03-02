@@ -75,13 +75,13 @@ export class Keymap {
     }
 
     toBinary(buffer: UhkBuffer, userConfiguration: UserConfiguration): void {
-        buffer.writeString(this.abbreviation);
-        buffer.writeBoolean(this.isDefault);
-        buffer.writeString(this.name);
-        buffer.writeString(this.description);
         buffer.writeArray(this.layers, (uhkBuffer: UhkBuffer, layer: Layer) => {
             layer.toBinary(uhkBuffer, userConfiguration);
         });
+        buffer.writeString(this.description);
+        buffer.writeString(this.name);
+        buffer.writeBoolean(this.isDefault);
+        buffer.writeString(this.abbreviation);
     }
 
     toString(): string {

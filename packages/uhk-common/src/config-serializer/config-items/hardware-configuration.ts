@@ -72,15 +72,18 @@ export class HardwareConfiguration {
     }
 
     toBinary(buffer: UhkBuffer): void {
-        buffer.writeString(this.signature);
-        buffer.writeUInt8(this.majorVersion);
-        buffer.writeUInt8(this.minorVersion);
-        buffer.writeUInt8(this.patchVersion);
-        buffer.writeUInt8(this.brandId);
-        buffer.writeUInt8(this.deviceId);
-        buffer.writeUInt32(this.uniqueId);
-        buffer.writeBoolean(this.isVendorModeOn);
+        buffer.prepareWrite();
+
+        // TODO: Need size field?
         buffer.writeBoolean(this.isIso);
+        buffer.writeBoolean(this.isVendorModeOn);
+        buffer.writeUInt32(this.uniqueId);
+        buffer.writeUInt8(this.deviceId);
+        buffer.writeUInt8(this.brandId);
+        buffer.writeUInt8(this.patchVersion);
+        buffer.writeUInt8(this.minorVersion);
+        buffer.writeUInt8(this.majorVersion);
+        buffer.writeString(this.signature);
     }
 
     toString(): string {

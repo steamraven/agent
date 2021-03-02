@@ -60,9 +60,9 @@ export class ScrollMouseMacroAction extends MacroAction {
     }
 
     toBinary(buffer: UhkBuffer) {
-        buffer.writeUInt8(MacroActionId.ScrollMouseMacroAction);
-        buffer.writeInt16(this.x);
         buffer.writeInt16(this.y);
+        buffer.writeInt16(this.x);
+        buffer.writeUInt8(MacroActionId.ScrollMouseMacroAction);
     }
 
     toString(): string {

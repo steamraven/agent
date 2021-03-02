@@ -71,8 +71,8 @@ export class MouseButtonMacroAction extends MacroAction {
     }
 
     toBinary(buffer: UhkBuffer): void {
-        buffer.writeUInt8(MacroActionId.MouseButtonMacroAction + this.action);
         buffer.writeUInt8(this.mouseButtonsMask);
+        buffer.writeUInt8(MacroActionId.MouseButtonMacroAction + this.action);
     }
 
     setMouseButtons(buttonStates: boolean[]): void {

@@ -43,6 +43,12 @@ export class UhkBuffer {
         this.buffer.fill(0);
     }
 
+    prepareWrite(): void {
+        if (this.offset === 0) {
+            this.offset = this.buffer.length;
+        }
+    }
+
     readInt8(): number {
         const value = this.buffer.readInt8(this.offset);
         this.dump(`i8(${value})`);
@@ -53,8 +59,8 @@ export class UhkBuffer {
 
     writeInt8(value: number): void {
         this.dump(`i8(${value})`);
+        this.offset -= 1;
         this.buffer.writeInt8(value, this.offset);
-        this.offset += 1;
     }
 
     readUInt8(): number {
@@ -67,8 +73,8 @@ export class UhkBuffer {
 
     writeUInt8(value: number): void {
         this.dump(`u8(${value})`);
+        this.offset -= 1;
         this.buffer.writeUInt8(value, this.offset);
-        this.offset += 1;
     }
 
     readInt16(): number {
@@ -81,8 +87,8 @@ export class UhkBuffer {
 
     writeInt16(value: number): void {
         this.dump(`i16(${value})`);
+        this.offset -= 2;
         this.buffer.writeInt16LE(value, this.offset);
-        this.offset += 2;
     }
 
     readUInt16(): number {
@@ -95,8 +101,8 @@ export class UhkBuffer {
 
     writeUInt16(value: number): void {
         this.dump(`u16(${value})`);
+        this.offset -= 2;
         this.buffer.writeUInt16LE(value, this.offset);
-        this.offset += 2;
     }
 
     readInt32(): number {
@@ -109,8 +115,8 @@ export class UhkBuffer {
 
     writeInt32(value: number): void {
         this.dump(`i32(${value})`);
+        this.offset -= 4;
         this.buffer.writeInt32LE(value, this.offset);
-        this.offset += 4;
     }
 
     readUInt32(): number {
@@ -123,8 +129,8 @@ export class UhkBuffer {
 
     writeUInt32(value: number): void {
         this.dump(`u32(${value})`);
+        this.offset -= 4;
         this.buffer.writeUInt32LE(value, this.offset);
-        this.offset += 4;
     }
 
     readCompactLength(): number {
@@ -137,8 +143,8 @@ export class UhkBuffer {
 
     writeCompactLength(length: number) {
         if (length >= UhkBuffer.longCompactLengthPrefix) {
-            this.writeUInt8(UhkBuffer.longCompactLengthPrefix);
             this.writeUInt16(length);
+            this.writeUInt8(UhkBuffer.longCompactLengthPrefix);
         } else {
             this.writeUInt8(length);
         }
@@ -160,11 +166,10 @@ export class UhkBuffer {
             throw `Cannot serialize string: ${stringByteLength} bytes is larger
                    than the maximum allowed length of ${UhkBuffer.maxCompactLength} bytes`;
         }
-
+        this.offset -= stringByteLength;
+        this.buffer.write(str, this.offset, stringByteLength, UhkBuffer.stringEncoding);
         this.writeCompactLength(stringByteLength);
         this.dump(`${UhkBuffer.stringEncoding}(${str})`);
-        this.buffer.write(str, this.offset, stringByteLength, UhkBuffer.stringEncoding);
-        this.offset += stringByteLength;
     }
 
     readBoolean(): boolean {
@@ -189,10 +194,10 @@ export class UhkBuffer {
         elementWriter: (buffer: UhkBuffer, element: T, index?: number) => void = UhkBuffer.simpleElementWriter
     ): void {
         const length = array.length;
-        this.writeCompactLength(length);
-        for (let i = 0; i < length; ++i) {
+        for (let i = length-1; i >= 0; --i) {
             elementWriter(this, array[i], i);
         }
+        this.writeCompactLength(length);
     }
 
     backtrack(): void {
@@ -201,7 +206,7 @@ export class UhkBuffer {
     }
 
     getBufferContent(): Buffer {
-        return this.buffer.slice(0, this.offset);
+        return this.buffer.slice(this.offset);
     }
 
     get enableDump() {

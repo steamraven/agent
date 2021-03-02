@@ -104,9 +104,9 @@ export class SwitchLayerAction extends KeyAction {
     }
 
     toBinary(buffer: UhkBuffer) {
-        buffer.writeUInt8(KeyActionId.SwitchLayerAction);
-        buffer.writeUInt8(this.layer);
         buffer.writeUInt8(mapSwitchLayerModeToNumber(this.switchLayerMode));
+        buffer.writeUInt8(this.layer);
+        buffer.writeUInt8(KeyActionId.SwitchLayerAction);
     }
 
     toString(): string {

@@ -161,30 +161,31 @@ export class UserConfiguration implements MouseSpeedConfiguration {
     }
 
     toBinary(buffer: UhkBuffer): void {
-        buffer.writeUInt16(this.userConfigMajorVersion);
-        buffer.writeUInt16(this.userConfigMinorVersion);
-        buffer.writeUInt16(this.userConfigPatchVersion);
-        buffer.writeUInt16(this.userConfigurationLength);
-        buffer.writeString(this.deviceName);
-        buffer.writeUInt16(this.doubleTapSwitchLayerTimeout);
-        buffer.writeUInt8(this.iconsAndLayerTextsBrightness);
-        buffer.writeUInt8(this.alphanumericSegmentsBrightness);
-        buffer.writeUInt8(this.keyBacklightBrightness);
-        buffer.writeUInt8(this.mouseMoveInitialSpeed);
-        buffer.writeUInt8(this.mouseMoveAcceleration);
-        buffer.writeUInt8(this.mouseMoveDeceleratedSpeed);
-        buffer.writeUInt8(this.mouseMoveBaseSpeed);
-        buffer.writeUInt8(this.mouseMoveAcceleratedSpeed);
-        buffer.writeUInt8(this.mouseScrollInitialSpeed);
-        buffer.writeUInt8(this.mouseScrollAcceleration);
-        buffer.writeUInt8(this.mouseScrollDeceleratedSpeed);
-        buffer.writeUInt8(this.mouseScrollBaseSpeed);
-        buffer.writeUInt8(this.mouseScrollAcceleratedSpeed);
-        buffer.writeArray(this.moduleConfigurations);
-        buffer.writeArray(this.macros);
+        buffer.prepareWrite();
         buffer.writeArray(this.keymaps, (uhkBuffer: UhkBuffer, keymap: Keymap) => {
             keymap.toBinary(uhkBuffer, this);
         });
+        buffer.writeArray(this.macros);
+        buffer.writeArray(this.moduleConfigurations);
+        buffer.writeUInt8(this.mouseScrollAcceleratedSpeed);
+        buffer.writeUInt8(this.mouseScrollBaseSpeed);
+        buffer.writeUInt8(this.mouseScrollDeceleratedSpeed);
+        buffer.writeUInt8(this.mouseScrollAcceleration);
+        buffer.writeUInt8(this.mouseScrollInitialSpeed);
+        buffer.writeUInt8(this.mouseMoveAcceleratedSpeed);
+        buffer.writeUInt8(this.mouseMoveBaseSpeed);
+        buffer.writeUInt8(this.mouseMoveDeceleratedSpeed);
+        buffer.writeUInt8(this.mouseMoveAcceleration);
+        buffer.writeUInt8(this.mouseMoveInitialSpeed);
+        buffer.writeUInt8(this.keyBacklightBrightness);
+        buffer.writeUInt8(this.alphanumericSegmentsBrightness);
+        buffer.writeUInt8(this.iconsAndLayerTextsBrightness);
+        buffer.writeUInt16(this.doubleTapSwitchLayerTimeout);
+        buffer.writeString(this.deviceName);
+        buffer.writeUInt16(this.userConfigurationLength);
+        buffer.writeUInt16(this.userConfigPatchVersion);
+        buffer.writeUInt16(this.userConfigMinorVersion);
+        buffer.writeUInt16(this.userConfigMajorVersion);
     }
 
     toString(): string {
@@ -203,7 +204,7 @@ export class UserConfiguration implements MouseSpeedConfiguration {
     recalculateConfigurationLength() {
         const buffer = new UhkBuffer();
         this.toBinary(buffer);
-        this.userConfigurationLength = buffer.offset;
+        this.userConfigurationLength = buffer.getBufferContent().length;
     }
 
     private setDefaultDeviceName(): void {

@@ -69,10 +69,10 @@ export class Macro {
     }
 
     toBinary(buffer: UhkBuffer): void {
-        buffer.writeBoolean(this.isLooped);
-        buffer.writeBoolean(this.isPrivate);
-        buffer.writeString(this.name);
         buffer.writeArray(this.macroActions);
+        buffer.writeString(this.name);
+        buffer.writeBoolean(this.isPrivate);
+        buffer.writeBoolean(this.isLooped);
     }
 
     toString(): string {

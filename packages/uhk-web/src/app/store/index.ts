@@ -178,7 +178,7 @@ export const getUserConfigAsBuffer = createSelector(getUserConfiguration, userCo
     const uhkBuffer = new UhkBuffer();
     config.toBinary(uhkBuffer);
 
-    return uhkBuffer;
+    return uhkBuffer.getBufferContent();
 });
 export const getUserConfigSize = createSelector(getUserConfigAsBuffer, uhkBuffer => {
     return uhkBuffer.getBufferContent().length;

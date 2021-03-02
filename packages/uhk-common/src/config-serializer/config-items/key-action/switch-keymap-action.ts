@@ -47,8 +47,8 @@ export class SwitchKeymapAction extends KeyAction {
 
     toBinary(buffer: UhkBuffer, userConfiguration: UserConfiguration): void {
         const keymapIndex = userConfiguration.keymaps.findIndex(keymap => keymap.abbreviation === this.keymapAbbreviation);
-        buffer.writeUInt8(KeyActionId.SwitchKeymapAction);
         buffer.writeUInt8(keymapIndex);
+        buffer.writeUInt8(KeyActionId.SwitchKeymapAction);
     }
 
     toString(): string {

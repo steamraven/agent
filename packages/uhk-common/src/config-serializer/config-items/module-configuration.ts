@@ -81,15 +81,15 @@ export class ModuleConfiguration {
     }
 
     toBinary(buffer: UhkBuffer): void {
-        buffer.writeUInt8(this.id);
-        buffer.writeUInt8(this.pointerMode);
-        buffer.writeUInt8(this.deceleratedPointerSpeedMultiplier);
-        buffer.writeUInt8(this.basePointerSpeedMultiplier);
-        buffer.writeUInt8(this.acceleratedPointerSpeedMultiplier);
-        buffer.writeUInt16(this.angularShift);
-        buffer.writeUInt8(this.modLayerPointerFunction);
-        buffer.writeUInt8(this.fnLayerPointerFunction);
         buffer.writeUInt8(this.mouseLayerPointerFunction);
+        buffer.writeUInt8(this.fnLayerPointerFunction);
+        buffer.writeUInt8(this.modLayerPointerFunction);
+        buffer.writeUInt16(this.angularShift);
+        buffer.writeUInt8(this.acceleratedPointerSpeedMultiplier);
+        buffer.writeUInt8(this.basePointerSpeedMultiplier);
+        buffer.writeUInt8(this.deceleratedPointerSpeedMultiplier);
+        buffer.writeUInt8(this.pointerMode);
+        buffer.writeUInt8(this.id);
     }
 
     toString(): string {

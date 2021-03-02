@@ -107,21 +107,21 @@ export class KeyMacroAction extends MacroAction {
         let TYPE_OFFSET = 0;
         TYPE_OFFSET |= this.action;
         TYPE_OFFSET |= this.type << 2;
-        TYPE_OFFSET |= ((this.hasScancode() ? 2 : 0) + (this.hasModifiers() ? 1 : 0)) << 4;
-
-        const keyMacroType: number = MacroActionId.KeyMacroAction + TYPE_OFFSET;
-
-        buffer.writeUInt8(keyMacroType);
+        
+        if (this.hasModifiers()) {
+            buffer.writeUInt8(this.modifierMask);
+            TYPE_OFFSET |= 1 << 4;
+        }
         if (this.hasScancode()) {
             if (this.type === KeystrokeType.longMedia) {
                 buffer.writeUInt16(this.scancode);
             } else {
                 buffer.writeUInt8(this.scancode);
             }
+            TYPE_OFFSET |= 1 << 5
         }
-        if (this.hasModifiers()) {
-            buffer.writeUInt8(this.modifierMask);
-        }
+        const keyMacroType: number = MacroActionId.KeyMacroAction + TYPE_OFFSET;
+        buffer.writeUInt8(keyMacroType);
     }
 
     toString(): string {

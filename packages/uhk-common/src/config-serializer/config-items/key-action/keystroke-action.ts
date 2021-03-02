@@ -135,33 +135,28 @@ export class KeystrokeAction extends KeyAction {
             long: boolean
         }[] = [];
 
-        if (this.hasScancode()) {
-            flags |= KeystrokeActionFlag.scancode;
-            toWrite.push({data: this._scancode, long: this.type === KeystrokeType.longMedia});
+        if (this.hasSecondaryRoleAction()) {
+            flags |= KeystrokeActionFlag.secondaryRoleAction;
+            buffer.writeUInt8(this.secondaryRoleAction);
         }
 
         if (this.hasActiveModifier()) {
             flags |= KeystrokeActionFlag.modifierMask;
-            toWrite.push({data: this.modifierMask, long: false});
+            buffer.writeUInt8(this.modifierMask);
         }
 
-        if (this.hasSecondaryRoleAction()) {
-            flags |= KeystrokeActionFlag.secondaryRoleAction;
-            toWrite.push({data: this.secondaryRoleAction, long: false});
+        if (this.hasScancode()) {
+            flags |= KeystrokeActionFlag.scancode;
+            if (this.type === KeystrokeType.longMedia) {
+                buffer.writeUInt16(this._scancode);
+            } else { 
+                buffer.writeUInt8(this._scancode);
+            }
         }
 
         const TYPE_OFFSET = flags + (this.type << KEYSTROKE_ACTION_FLAG_LENGTH);
 
         buffer.writeUInt8(KeyActionId.NoneAction + TYPE_OFFSET); // NoneAction is the same as an empty KeystrokeAction.
-
-        for (let i = 0; i < toWrite.length; ++i) {
-            if (toWrite[i].long) {
-                buffer.writeUInt16(toWrite[i].data);
-            } else {
-                buffer.writeUInt8(toWrite[i].data);
-            }
-        }
-
     }
 
     toString(): string {

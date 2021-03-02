@@ -76,8 +76,8 @@ export class MouseAction extends KeyAction {
     }
 
     toBinary(buffer: UhkBuffer) {
-        buffer.writeUInt8(KeyActionId.MouseAction);
         buffer.writeUInt8(this.mouseAction);
+        buffer.writeUInt8(KeyActionId.MouseAction);
     }
 
     toString(): string {

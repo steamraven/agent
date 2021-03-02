@@ -55,8 +55,8 @@ export class DelayMacroAction extends MacroAction {
     }
 
     toBinary(buffer: UhkBuffer) {
-        buffer.writeUInt8(MacroActionId.DelayMacroAction);
         buffer.writeUInt16(this.delay);
+        buffer.writeUInt8(MacroActionId.DelayMacroAction);
     }
 
     toString(): string {

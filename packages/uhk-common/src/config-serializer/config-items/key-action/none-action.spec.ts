@@ -39,10 +39,12 @@ describe('node-action', () => {
         it('should work', () => {
             const buffer = new UhkBuffer();
             const action = new NoneAction();
+            buffer.prepareWrite();
             action.toBinary(buffer);
 
             const expected = new UhkBuffer();
-            expected.offset = 1;
+            expected.prepareWrite();
+            expected.offset -= 1;
             expect(buffer).toEqual(expected);
         });
     });

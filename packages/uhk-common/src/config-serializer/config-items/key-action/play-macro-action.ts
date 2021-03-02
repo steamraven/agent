@@ -61,8 +61,8 @@ export class PlayMacroAction extends KeyAction {
     }
 
     toBinary(buffer: UhkBuffer, userConfiguration: UserConfiguration) {
-        buffer.writeUInt8(KeyActionId.PlayMacroAction);
         buffer.writeUInt8(userConfiguration.macros.findIndex(macro => macro.id === this.macroId));
+        buffer.writeUInt8(KeyActionId.PlayMacroAction);
     }
 
     toString(): string {

@@ -53,8 +53,8 @@ export class TextMacroAction extends MacroAction {
     }
 
     toBinary(buffer: UhkBuffer) {
-        buffer.writeUInt8(MacroActionId.TextMacroAction);
         buffer.writeString(this.text);
+        buffer.writeUInt8(MacroActionId.TextMacroAction);
     }
 
     toString(): string {

@@ -64,8 +64,6 @@ export class Module {
     }
 
     toBinary(buffer: UhkBuffer, userConfiguration: UserConfiguration): void {
-        buffer.writeUInt8(this.id);
-
         const noneAction = new NoneAction();
 
         buffer.writeArray(this.keyActions, (uhkBuffer: UhkBuffer, keyAction: KeyAction) => {
@@ -75,6 +73,7 @@ export class Module {
                 noneAction.toBinary(uhkBuffer);
             }
         });
+        buffer.writeUInt8(this.id);
     }
 
     toString(): string {
