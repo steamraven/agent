@@ -34,6 +34,7 @@ export class Keymap {
             case 2:
             case 3:
             case 4:
+            case 5:
                 this.fromJsonObjectV1(jsonObject, macros, version);
                 break;
 
@@ -47,12 +48,16 @@ export class Keymap {
     }
 
     fromBinary(buffer: UhkBuffer, macros: Macro[], version: number): Keymap {
+        let maxOffset = buffer.offset;
         switch (version) {
+            case 5:
+                maxOffset = buffer.readCompactLength() + buffer.offset;
+                // fallthrough
             case 1:
             case 2:
             case 3:
             case 4:
-                this.fromBinaryV1(buffer, macros, version);
+                this.fromBinaryV1(buffer, macros, version, maxOffset);
                 break;
 
             default:
@@ -75,6 +80,7 @@ export class Keymap {
     }
 
     toBinary(buffer: UhkBuffer, userConfiguration: UserConfiguration): void {
+        let endOffset = buffer.offset;
         buffer.writeArray(this.layers, (uhkBuffer: UhkBuffer, layer: Layer) => {
             layer.toBinary(uhkBuffer, userConfiguration);
         });
@@ -82,6 +88,7 @@ export class Keymap {
         buffer.writeString(this.name);
         buffer.writeBoolean(this.isDefault);
         buffer.writeString(this.abbreviation);
+        buffer.writeCompactLength(endOffset - buffer.offset);
     }
 
     toString(): string {
@@ -179,7 +186,7 @@ export class Keymap {
         this.layers = jsonObject.layers.map((layer: any) => new Layer().fromJsonObject(layer, macros, version));
     }
 
-    private fromBinaryV1(buffer: UhkBuffer, macros: Macro[], version: number): void {
+    private fromBinaryV1(buffer: UhkBuffer, macros: Macro[], version: number, maxOffset: number): void {
         this.abbreviation = buffer.readString();
         this.isDefault = buffer.readBoolean();
         this.name = buffer.readString();
@@ -187,5 +194,8 @@ export class Keymap {
         this.layers = buffer.readArray<Layer>(uhkBuffer => {
             return new Layer().fromBinary(uhkBuffer,  macros, version);
         });
+        if (buffer.offset < maxOffset) {
+
+        }
     }
 }

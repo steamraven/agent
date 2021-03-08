@@ -33,6 +33,7 @@ export class Macro {
             case 2:
             case 3:
             case 4:
+            case 5:
                 this.fromJsonObjectV1(jsonObject, version);
                 break;
 
@@ -44,12 +45,16 @@ export class Macro {
     }
 
     fromBinary(buffer: UhkBuffer, version: number): Macro {
+        let maxOffset = buffer.offset;
         switch (version) {
+            case 5:
+                maxOffset = buffer.readCompactLength() + buffer.offset;
+                // fallthrough
             case 1:
             case 2:
             case 3:
             case 4:
-                this.fromBinaryV1(buffer, version);
+                this.fromBinaryV1(buffer, version, maxOffset);
                 break;
 
             default:
@@ -69,10 +74,12 @@ export class Macro {
     }
 
     toBinary(buffer: UhkBuffer): void {
+        let endOffset = buffer.offset;
         buffer.writeArray(this.macroActions);
         buffer.writeString(this.name);
         buffer.writeBoolean(this.isPrivate);
         buffer.writeBoolean(this.isLooped);
+        buffer.writeCompactLength(endOffset - buffer.offset);
     }
 
     toString(): string {
@@ -88,7 +95,7 @@ export class Macro {
         });
     }
 
-    private fromBinaryV1(buffer: UhkBuffer, version: number): void {
+    private fromBinaryV1(buffer: UhkBuffer, version: number, maxOffset: number): void {
         this.isLooped = buffer.readBoolean();
         this.isPrivate = buffer.readBoolean();
         this.name = buffer.readString();
@@ -96,6 +103,9 @@ export class Macro {
         this.macroActions = [];
         for (let i = 0; i < macroActionsLength; ++i) {
             this.macroActions.push(MacroActionHelper.createMacroAction(buffer, version));
+        }
+        if (buffer.offset < maxOffset) {
+
         }
     }
 }

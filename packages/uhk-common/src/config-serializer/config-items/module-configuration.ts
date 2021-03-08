@@ -40,6 +40,7 @@ export class ModuleConfiguration {
             case 2:
             case 3:
             case 4:
+            case 5:
                 this.fromJsonObjectV1(jsonObject);
                 break;
 
@@ -51,12 +52,16 @@ export class ModuleConfiguration {
     }
 
     fromBinary(buffer: UhkBuffer, version: number): ModuleConfiguration {
+        let maxOffset = buffer.offset;
         switch (version) {
+            case 5:
+                maxOffset = buffer.readCompactLength() + buffer.offset;
+                // Fallthrough
             case 1:
             case 2:
             case 3:
             case 4:
-                this.fromBinaryV1(buffer);
+                this.fromBinaryV1(buffer, maxOffset);
                 break;
 
             default:
@@ -81,6 +86,7 @@ export class ModuleConfiguration {
     }
 
     toBinary(buffer: UhkBuffer): void {
+        let endOffset = buffer.offset;
         buffer.writeUInt8(this.mouseLayerPointerFunction);
         buffer.writeUInt8(this.fnLayerPointerFunction);
         buffer.writeUInt8(this.modLayerPointerFunction);
@@ -90,6 +96,7 @@ export class ModuleConfiguration {
         buffer.writeUInt8(this.deceleratedPointerSpeedMultiplier);
         buffer.writeUInt8(this.pointerMode);
         buffer.writeUInt8(this.id);
+        buffer.writeCompactLength(endOffset - buffer.offset);
     }
 
     toString(): string {
@@ -108,7 +115,7 @@ export class ModuleConfiguration {
         this.mouseLayerPointerFunction = jsonObject.mouseLayerPointerFunction;
     }
 
-    private fromBinaryV1(buffer: UhkBuffer): void {
+    private fromBinaryV1(buffer: UhkBuffer, maxOffset: number): void {
         this.id = buffer.readUInt8();
         this.pointerMode = buffer.readInt8();
         this.deceleratedPointerSpeedMultiplier = buffer.readUInt8();
@@ -118,5 +125,8 @@ export class ModuleConfiguration {
         this.modLayerPointerFunction = buffer.readUInt8();
         this.fnLayerPointerFunction = buffer.readUInt8();
         this.mouseLayerPointerFunction = buffer.readUInt8();
+        if (buffer.offset < maxOffset) {
+
+        }
     }
 }

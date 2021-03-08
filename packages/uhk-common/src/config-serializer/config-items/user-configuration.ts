@@ -95,6 +95,7 @@ export class UserConfiguration implements MouseSpeedConfiguration {
             case 2:
             case 3:
             case 4:
+            case 5:
                 this.fromJsonObjectV1(jsonObject);
                 break;
 
@@ -118,6 +119,7 @@ export class UserConfiguration implements MouseSpeedConfiguration {
             case 2:
             case 3:
             case 4:
+            case 5:
                 this.fromBinaryV1(buffer);
                 break;
 
@@ -161,6 +163,7 @@ export class UserConfiguration implements MouseSpeedConfiguration {
     }
 
     toBinary(buffer: UhkBuffer): void {
+        let endOffset = buffer.offset;
         buffer.prepareWrite();
         buffer.writeArray(this.keymaps, (uhkBuffer: UhkBuffer, keymap: Keymap) => {
             keymap.toBinary(uhkBuffer, this);
@@ -182,7 +185,10 @@ export class UserConfiguration implements MouseSpeedConfiguration {
         buffer.writeUInt8(this.iconsAndLayerTextsBrightness);
         buffer.writeUInt16(this.doubleTapSwitchLayerTimeout);
         buffer.writeString(this.deviceName);
-        buffer.writeUInt16(this.userConfigurationLength);
+        
+        let userConfigurationLength = endOffset - buffer.offset + 2*4;
+
+        buffer.writeUInt16(userConfigurationLength);
         buffer.writeUInt16(this.userConfigPatchVersion);
         buffer.writeUInt16(this.userConfigMinorVersion);
         buffer.writeUInt16(this.userConfigMajorVersion);
@@ -269,8 +275,12 @@ export class UserConfiguration implements MouseSpeedConfiguration {
             macro.id = index;
             return macro;
         });
-        this.keymaps = buffer.readArray<Keymap>(uhkBuffer => new Keymap().fromBinary(uhkBuffer, this.macros, 1));
+        this.keymaps = buffer.readArray<Keymap>(uhkBuffer => new Keymap().fromBinary(uhkBuffer, this.macros, this.userConfigMajorVersion));
         ConfigSerializer.resolveSwitchKeymapActions(this.keymaps);
+
+        if (buffer.offset < this.userConfigurationLength) {
+
+        }
 
     }
 
