@@ -8,6 +8,7 @@ import { KeystrokeAction, NoneAction } from './key-action';
 import { SecondaryRoleAction } from './secondary-role-action';
 import { isScancodeExists } from './scancode-checker';
 import { MouseSpeedConfiguration } from './mouse-speed-configuration';
+import {Extension} from './extension';
 
 export class UserConfiguration implements MouseSpeedConfiguration {
 
@@ -72,6 +73,8 @@ export class UserConfiguration implements MouseSpeedConfiguration {
     keymaps: Keymap[] = [];
 
     macros: Macro[] = [];
+
+    extensions: Extension[] = [];
 
     constructor() {
         this.setDefaultDeviceName();
@@ -158,13 +161,15 @@ export class UserConfiguration implements MouseSpeedConfiguration {
             mouseScrollAcceleratedSpeed: this.mouseScrollAcceleratedSpeed,
             moduleConfigurations: this.moduleConfigurations.map(moduleConfiguration => moduleConfiguration.toJsonObject()),
             keymaps: this.keymaps.map(keymap => keymap.toJsonObject(this.macros)),
-            macros: this.macros.map(macro => macro.toJsonObject())
+            macros: this.macros.map(macro => macro.toJsonObject()),
+            extensions: this.extensions.map(extension => extension.toJsonObject()),
         };
     }
 
     toBinary(buffer: UhkBuffer): void {
         let endOffset = buffer.offset;
         buffer.prepareWrite();
+        buffer.writeArray(this.extensions);
         buffer.writeArray(this.keymaps, (uhkBuffer: UhkBuffer, keymap: Keymap) => {
             keymap.toBinary(uhkBuffer, this);
         });
@@ -279,7 +284,7 @@ export class UserConfiguration implements MouseSpeedConfiguration {
         ConfigSerializer.resolveSwitchKeymapActions(this.keymaps);
 
         if (buffer.offset < this.userConfigurationLength) {
-
+            this.extensions = buffer.readArray<Extension>(uhkBuffer => new Extension().fromBinary(uhkBuffer, this.userConfigMajorVersion))
         }
 
     }
@@ -312,6 +317,11 @@ export class UserConfiguration implements MouseSpeedConfiguration {
         this.keymaps = jsonObject.keymaps.map((keymap: any) => {
             return new Keymap().fromJsonObject(keymap, this.macros, this.userConfigMajorVersion);
         });
+        if (jsonObject.hasOwnProperty("extensions")){
+            this.extensions = jsonObject.extensions.map((extension:any) => {
+                return new Extension().fromJsonObject(extension, this.userConfigMajorVersion);
+            })
+        }
     }
 
 }

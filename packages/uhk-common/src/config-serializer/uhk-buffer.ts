@@ -200,6 +200,24 @@ export class UhkBuffer {
         this.writeCompactLength(length);
     }
 
+    readBuffer(): Buffer {
+        const bufferByteLength = this.readCompactLength();
+        const buffer = Buffer.from(this.buffer.slice(this.offset, this.offset+bufferByteLength));
+        this.dump(`hex(${buffer.toString("hex")})`);
+        this.bytesToBacktrack = bufferByteLength;
+        this.offset += bufferByteLength;
+        return buffer;
+    }
+
+    writeBuffer(buffer: Buffer): void {
+        this.offset -= buffer.byteLength;
+        buffer.copy(this.buffer, this.offset);
+        this.writeCompactLength(buffer.byteLength);
+        this.dump(`hex(${buffer.toString("hex")})`);
+    }
+
+
+
     backtrack(): void {
         this.offset -= this.bytesToBacktrack;
         this.bytesToBacktrack = 0;
